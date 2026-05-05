@@ -45,7 +45,7 @@ See `docker-compose.yaml` for complete list of configurable options.
 
 ## 📂 Volumes
 
-- `./rootfs/data/strapi` - Data storage
+- `./volumes/data/strapi` - Data storage
 
 ## 🔍 Logging
 
