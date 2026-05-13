@@ -20,9 +20,9 @@ services:
       HOST: ${STRAPI_HOST:-0.0.0.0}
       PORT: ${STRAPI_PORT:-1337}
       APP_KEYS: ${APP_SECRET_KEY:-changeme_secret_key_min_32_chars}
-      API_TOKEN_SALT: ${API_TOKEN_SALT:-changeme_api_token_salt_32chars}
-      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:-changeme_admin_jwt_secret_32c}
-      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT:-changeme_transfer_token_salt32}
+      API_TOKEN_SALT: ${APP_SECRET_TOKEN_32:-changeme_api_token_salt_32chars}
+      ADMIN_JWT_SECRET: ${APP_JWT_TOKEN:-changeme_admin_jwt_secret_32c}
+      TRANSFER_TOKEN_SALT: ${ENCRYPTION_KEY:-changeme_transfer_token_salt32}
       DATABASE_CLIENT: ${DATABASE_CLIENT:-sqlite}
       DATABASE_FILENAME: /data/strapi.db
       CONTAINER_NAME: strapi-app
