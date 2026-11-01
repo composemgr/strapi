@@ -1,0 +1,51 @@
+name: strapi
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: naskio/strapi:latest
+    container_name: strapi-app
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+      HOST: ${STRAPI_HOST:-0.0.0.0}
+      PORT: ${STRAPI_PORT:-1337}
+      APP_KEYS: ${APP_SECRET_KEY:-replace-with-a-random-app-key}
+      API_TOKEN_SALT: ${APP_SECRET_TOKEN_32:-replace-with-a-random-api-token-salt}
+      ADMIN_JWT_SECRET: ${APP_JWT_TOKEN:-replace-with-a-random-jwt-secret}
+      TRANSFER_TOKEN_SALT: ${ENCRYPTION_KEY:-replace-with-a-random-transfer-salt}
+      DATABASE_CLIENT: ${DATABASE_CLIENT:-sqlite}
+      NODE_ENV: ${STRAPI_NODE_ENV:-development}
+      CONTAINER_NAME: strapi-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+    volumes:
+      - './volumes/data/strapi:/srv/app'
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=traefik'
+      - 'traefik.http.routers.strapi-app.entrypoints=http'
+      - 'traefik.http.routers.strapi-app.rule=Host(`${BASE_HOST_NAME:-$HOSTNAME}`)'
+      - 'traefik.http.routers.strapi-app.middlewares=strapi-app-https-redirect'
+      - 'traefik.http.middlewares.strapi-app-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.routers.strapi-app-secure.entrypoints=https'
+      - 'traefik.http.routers.strapi-app-secure.rule=Host(`${BASE_HOST_NAME:-$HOSTNAME}`)'
+      - 'traefik.http.routers.strapi-app-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.strapi-app-secure.service=strapi-app'
+      - 'traefik.http.services.strapi-app.loadbalancer.server.port=1337'
+    networks:
+      - strapi
+      - traefik
+
+networks:
+  strapi:
+    name: strapi
+    external: false
+  traefik:
+    external: true

@@ -1,4 +1,4 @@
-# nginx proxy address - http://172.17.0.1:1337
+# nginx proxy address - http://172.17.0.1:64358
 
 name: strapi
 x-logging: &default-logging
@@ -9,7 +9,7 @@ x-logging: &default-logging
 
 services:
   app:
-    image: strapi/strapi:latest
+    image: naskio/strapi:latest
     container_name: strapi-app
     hostname: ${BASE_HOST_NAME:-$HOSTNAME}
     restart: always
@@ -19,45 +19,22 @@ services:
       TZ: ${TZ:-America/New_York}
       HOST: ${STRAPI_HOST:-0.0.0.0}
       PORT: ${STRAPI_PORT:-1337}
-      APP_KEYS: ${APP_SECRET_KEY:-changeme_secret_key_min_32_chars}
-      API_TOKEN_SALT: ${APP_SECRET_TOKEN_32:-changeme_api_token_salt_32chars}
-      ADMIN_JWT_SECRET: ${APP_JWT_TOKEN:-changeme_admin_jwt_secret_32c}
-      TRANSFER_TOKEN_SALT: ${ENCRYPTION_KEY:-changeme_transfer_token_salt32}
+      APP_KEYS: ${APP_SECRET_KEY:-replace-with-a-random-app-key}
+      API_TOKEN_SALT: ${APP_SECRET_TOKEN_32:-replace-with-a-random-api-token-salt}
+      ADMIN_JWT_SECRET: ${APP_JWT_TOKEN:-replace-with-a-random-jwt-secret}
+      TRANSFER_TOKEN_SALT: ${ENCRYPTION_KEY:-replace-with-a-random-transfer-salt}
       DATABASE_CLIENT: ${DATABASE_CLIENT:-sqlite}
-      DATABASE_FILENAME: /data/strapi.db
+      NODE_ENV: ${STRAPI_NODE_ENV:-development}
       CONTAINER_NAME: strapi-app
       HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
     ports:
-      - '172.17.0.1:1337:1337'
+      - '172.17.0.1:64358:1337'
     volumes:
-      - './volumes/data/strapi:/data'
-      - './volumes/config/strapi:/config'
-    labels:
-      - 'traefik.enable=true'
-      - 'cloudflare.enable=true'
-      - 'traefik.docker.network=proxy'
-      - 'cloudflare.service=http://strapi-app:1337'
-      - 'cloudflare.hostname=strapi.${CLOUDFLARE_ZONE_NAME:-}'
-      - 'traefik.http.routers.strapi-app.entrypoints=http'
-      - 'traefik.http.routers.strapi-app-secure.tls=true'
-      - 'traefik.http.routers.strapi-app.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
-      - 'traefik.http.middlewares.strapi-app-https-redirect.redirectscheme.scheme=https'
-      - 'traefik.http.routers.strapi-app.middlewares=strapi-app-https-redirect'
-      - 'traefik.http.routers.strapi-app-secure.entrypoints=https'
-      - 'traefik.http.routers.strapi-app-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
-      - 'traefik.http.routers.strapi-app-secure.tls.certresolver=cloudflare'
-      - 'traefik.http.routers.strapi-app-secure.service=strapi-app'
-      - 'traefik.http.services.strapi-app.loadbalancer.server.port=1337'
+      - './volumes/data/strapi:/srv/app'
     networks:
       - strapi
-      - proxy
-      - cloudflare
 
 networks:
   strapi:
     name: strapi
     external: false
-  proxy:
-    external: true
-  cloudflare:
-    external: true
