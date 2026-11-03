@@ -25,6 +25,12 @@ services:
       NODE_ENV: ${STRAPI_NODE_ENV:-development}
       CONTAINER_NAME: strapi-app
       HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+    healthcheck:
+      test: ['CMD', 'curl', '-s', '-o', '/dev/null', '--max-time', '5', 'http://127.0.0.1:1337/']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     volumes:
       - './volumes/data/strapi:/srv/app'
     labels:
